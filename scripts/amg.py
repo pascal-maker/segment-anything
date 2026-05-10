@@ -168,7 +168,11 @@ def write_masks_to_folder(masks: List[Dict[str, Any]], path: str) -> None:
         row = ",".join(mask_metadata)
         metadata.append(row)
     metadata_path = os.path.join(path, "metadata.csv")
-    with open(metadata_path, "w") as f:
+    metadata_path_real = os.path.realpath(metadata_path)
+    path_real = os.path.realpath(path)
+    if os.path.commonpath([path_real, metadata_path_real]) != path_real:
+        raise Exception("Invalid file path")
+    with open(metadata_path_real, "w") as f:
         f.write("\n".join(metadata))
 
     return
@@ -228,7 +232,11 @@ def main(args: argparse.Namespace) -> None:
             write_masks_to_folder(masks, save_base)
         else:
             save_file = save_base + ".json"
-            with open(save_file, "w") as f:
+            output_real = os.path.realpath(args.output)
+            save_file_real = os.path.realpath(save_file)
+            if os.path.commonpath([output_real, save_file_real]) != output_real:
+                raise Exception("Invalid file path")
+            with open(save_file_real, "w") as f:
                 json.dump(masks, f)
     print("Done!")
 
